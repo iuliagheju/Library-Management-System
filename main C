@@ -1,0 +1,368 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char title[100];
+    char author[50];
+    int copies;
+} Book;
+
+typedef struct {
+    char title[100];
+    char author[50];
+    int copiesBorrowed;
+} BorrowedBook;
+
+typedef struct {
+    char name[50];
+    char surname[50];
+    BorrowedBook borrowedBooks[10];
+    int numBorrowedBooks;
+} Person;
+
+typedef struct {
+    Person persons[100];
+    Book books[100];
+    int numPersons;
+    int numBooks;
+} Library;
+
+Library library;
+Person *currentUser = NULL;
+
+void initializeLibrary() {
+
+    library.numPersons = 0;
+    library.numBooks = 0;
+
+
+    strcpy(library.persons[library.numPersons].name, "Harry");
+    strcpy(library.persons[library.numPersons].surname, "Potter");
+    library.persons[library.numPersons].numBorrowedBooks = 0;
+    library.numPersons++;
+
+    strcpy(library.persons[library.numPersons].name, "Hermione");
+    strcpy(library.persons[library.numPersons].surname, "Granger");
+    library.persons[library.numPersons].numBorrowedBooks = 3;
+    library.numPersons++;
+
+    strcpy(library.persons[library.numPersons].name, "Ron");
+    strcpy(library.persons[library.numPersons].surname, "Weasley");
+    library.persons[library.numPersons].numBorrowedBooks = 0;
+    library.numPersons++;
+
+    strcpy(library.persons[library.numPersons].name, "Draco");
+    strcpy(library.persons[library.numPersons].surname, "Malfoy");
+    library.persons[library.numPersons].numBorrowedBooks = 1;
+    library.numPersons++;
+
+    strcpy(library.persons[library.numPersons].name, "Neville");
+    strcpy(library.persons[library.numPersons].surname, "Longbottom");
+    library.persons[library.numPersons].numBorrowedBooks = 1;
+    library.numPersons++;
+
+    strcpy(library.persons[library.numPersons].name, "Luna");
+    strcpy(library.persons[library.numPersons].surname, "Lovegood");
+    library.persons[library.numPersons].numBorrowedBooks = 2;
+    library.numPersons++;
+
+
+strcpy(library.books[library.numBooks].title, "1984");
+strcpy(library.books[library.numBooks].author, "George Orwell");
+library.books[library.numBooks].copies = 3;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "The Portrait of Dorian Gray");
+strcpy(library.books[library.numBooks].author, "Oscar Wilde");
+library.books[library.numBooks].copies = 5;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "Cat's Eye");
+strcpy(library.books[library.numBooks].author, "Margaret Atwood");
+library.books[library.numBooks].copies = 6;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "The Old Man and the Sea");
+strcpy(library.books[library.numBooks].author, "Ernest Hemingway");
+library.books[library.numBooks].copies = 4;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "The Catcher in the Rye");
+strcpy(library.books[library.numBooks].author, "J.D. Salinger");
+library.books[library.numBooks].copies = 5;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "Ordeal by Innocence");
+strcpy(library.books[library.numBooks].author, "Agatha Christie");
+library.books[library.numBooks].copies = 4;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "Frankenstein");
+strcpy(library.books[library.numBooks].author, "Mary Shelley");
+library.books[library.numBooks].copies = 7;
+library.numBooks++;
+
+strcpy(library.books[library.numBooks].title, "Alias Grace");
+strcpy(library.books[library.numBooks].author, "Margaret Atwood");
+library.books[library.numBooks].copies = 3;
+library.numBooks++;
+
+}
+void login(char *name, char *surname);
+void borrowBooks();
+void returnOrDonateBooks();
+void viewLoans();
+void searchForBooks();
+void mainMenu();
+
+void login(char *name, char *surname) {
+    for (int i = 0; i < library.numPersons; i++) {
+        if (strcmp(library.persons[i].name, name) == 0 && strcmp(library.persons[i].surname, surname) == 0) {
+            currentUser = &library.persons[i];
+            printf("Login successful. Welcome, %s %s!\n", name, surname);
+            return;
+        }
+    }
+    printf("Login failed. User %s %s not found.\n", name, surname);
+    currentUser = NULL;
+}
+
+
+
+int main() {
+    char name[50], surname[50];
+
+
+    initializeLibrary();
+
+    while (1) {
+        printf("Welcome to Hogwarts Library System! Enter name and surname to login (or type 'exit' to quit): ");
+        if (scanf("%49s %49s", name, surname) != 2) {
+            printf("Error reading input. Please try again.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        if (strcmp(name, "exit") == 0 || strcmp(surname, "exit") == 0) {
+            break;
+        }
+
+        login(name, surname);
+
+        if (currentUser != NULL) {
+
+            mainMenu();
+            currentUser = NULL;
+        } else {
+            printf("Login failed. Please try again.\n");
+        }
+    }
+
+    printf("Exiting program.\n");
+    return 0;
+}
+
+
+
+void searchForBooks() {
+    int searchOption;
+    char titleSearch[100], authorSearch[50];
+
+    printf("Search for books\n");
+    printf("1. By title\n");
+    printf("2. By author\n");
+    printf("3. By title and author\n");
+    printf("Choose your search option: ");
+    scanf("%d", &searchOption);
+    getchar(); // Consume the newline character left in the input buffer
+
+    switch(searchOption) {
+        case 1:
+            printf("Enter title: ");
+            fgets(titleSearch, sizeof(titleSearch), stdin);
+            titleSearch[strcspn(titleSearch, "\n")] = 0;
+            break;
+        case 2:
+            printf("Enter author: ");
+            fgets(authorSearch, sizeof(authorSearch), stdin);
+            authorSearch[strcspn(authorSearch, "\n")] = 0;
+            break;
+        case 3:
+            printf("Enter title: ");
+            fgets(titleSearch, sizeof(titleSearch), stdin);
+            titleSearch[strcspn(titleSearch, "\n")] = 0;
+            printf("Enter author: ");
+            fgets(authorSearch, sizeof(authorSearch), stdin);
+            authorSearch[strcspn(authorSearch, "\n")] = 0;
+            break;
+        default:
+            printf("Invalid option. Returning to main menu.\n");
+            return;
+    }
+
+
+    int found = 0;
+    for (int i = 0; i < library.numBooks; i++) {
+        int titleMatch = (searchOption == 1 || searchOption == 3) && strcmp(library.books[i].title, titleSearch) == 0;
+        int authorMatch = (searchOption == 2 || searchOption == 3) && strcmp(library.books[i].author, authorSearch) == 0;
+
+        if (searchOption == 1 && titleMatch || searchOption == 2 && authorMatch || searchOption == 3 && titleMatch && authorMatch) {
+            printf("Book found: Title: \"%s\", Author: \"%s\", Copies Available: %d\n", library.books[i].title, library.books[i].author, library.books[i].copies);
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("No books found.\n");
+    }
+}
+void borrowBooks() {
+    if (currentUser == NULL) {
+        printf("No user is currently logged in.\n");
+        return;
+    }
+
+    char title[100], author[50];
+    printf("Enter the title of the book you wish to borrow: ");
+    getchar();
+    fgets(title, sizeof(title), stdin);
+    title[strcspn(title, "\n")] = 0;
+
+    printf("Enter the author of the book: ");
+    fgets(author, sizeof(author), stdin);
+    author[strcspn(author, "\n")] = 0;
+
+    for (int i = 0; i < library.numBooks; i++) {
+        if (strcmp(library.books[i].title, title) == 0 && strcmp(library.books[i].author, author) == 0 && library.books[i].copies > 0) {
+
+            library.books[i].copies--;
+
+
+            int borrowedIndex = currentUser->numBorrowedBooks;
+            strcpy(currentUser->borrowedBooks[borrowedIndex].title, title);
+            strcpy(currentUser->borrowedBooks[borrowedIndex].author, author);
+            currentUser->borrowedBooks[borrowedIndex].copiesBorrowed = 1;
+            currentUser->numBorrowedBooks++;
+
+            printf("You have successfully borrowed '%s' by %s.\n", title, author);
+            return;
+        }
+    }
+
+    printf("The book '%s' by %s is not available.\n", title, author);
+}
+void viewLoans() {
+    if (currentUser == NULL) {
+        printf("No user is currently logged in.\n");
+        return;
+    }
+
+    if (currentUser->numBorrowedBooks == 0) {
+        printf("%s %s has not borrowed any books.\n", currentUser->name, currentUser->surname);
+        return;
+    }
+
+    printf("Loans for %s %s:\n", currentUser->name, currentUser->surname);
+    for (int i = 0; i < currentUser->numBorrowedBooks; i++) {
+        printf("%d. '%s' by %s, Copies Borrowed: %d\n",
+               i + 1,
+               currentUser->borrowedBooks[i].title,
+               currentUser->borrowedBooks[i].author,
+               currentUser->borrowedBooks[i].copiesBorrowed);
+    }
+}
+void returnOrDonateBooks() {
+    if (currentUser == NULL) {
+        printf("No user is currently logged in.\n");
+        return;
+    }
+
+    int choice;
+    printf("1. Return a borrowed book\n");
+    printf("2. Donate a new book\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+    getchar();
+
+    if (choice == 1) {
+
+        char title[100], author[50];
+        printf("Enter the title of the book you wish to return: ");
+        fgets(title, sizeof(title), stdin);
+        title[strcspn(title, "\n")] = 0;
+
+        printf("Enter the author of the book: ");
+        fgets(author, sizeof(author), stdin);
+        author[strcspn(author, "\n")] = 0;
+
+
+        int found = 0;
+        for (int i = 0; i < currentUser->numBorrowedBooks; i++) {
+            if (strcmp(currentUser->borrowedBooks[i].title, title) == 0 && strcmp(currentUser->borrowedBooks[i].author, author) == 0) {
+
+                currentUser->borrowedBooks[i].copiesBorrowed--;
+                if (currentUser->borrowedBooks[i].copiesBorrowed <= 0) {
+                    currentUser->numBorrowedBooks--;
+                }
+
+                for (int j = 0; j < library.numBooks; j++) {
+                    if (strcmp(library.books[j].title, title) == 0 && strcmp(library.books[j].author, author) == 0) {
+                        library.books[j].copies++;
+                        break;
+                    }
+                }
+                printf("Book returned successfully.\n");
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            printf("You have not borrowed this book.\n");
+        }
+    } else if (choice == 2) {
+        Book newBook;
+        printf("Enter the title of the book you wish to donate: ");
+        fgets(newBook.title, sizeof(newBook.title), stdin);
+        newBook.title[strcspn(newBook.title, "\n")] = 0;
+
+        printf("Enter the author of the book: ");
+        fgets(newBook.author, sizeof(newBook.author), stdin);
+        newBook.author[strcspn(newBook.author, "\n")] = 0;
+
+        printf("Enter the number of copies to donate: ");
+        scanf("%d", &newBook.copies);
+        getchar();
+
+
+        library.books[library.numBooks] = newBook;
+        library.numBooks++;
+        printf("Thank you for donating '%s' by %s. Total copies: %d\n", newBook.title, newBook.author, newBook.copies);
+    } else {
+        printf("Invalid choice. Returning to main menu.\n");
+    }
+}
+
+
+void mainMenu() {
+    int choice;
+    while(1) {
+        printf("\nLibrary Management System\n");
+        printf("1. Borrow Books\n");
+        printf("2. Return/Donate Books\n");
+        printf("3. View Loans\n");
+        printf("4. Search for Books\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1: borrowBooks(); break;
+            case 2: returnOrDonateBooks(); break;
+            case 3: viewLoans(); break;
+            case 4: searchForBooks(); break;
+            case 5: printf("Exiting..."); exit(0);
+            default: printf("Invalid choice. Please try again.\n");
+        }
+    }
+}
