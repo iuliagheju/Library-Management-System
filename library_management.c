@@ -197,7 +197,7 @@ int authenticate_user(const char *name, const char *surname) {
         }
     }
     // If no user found, print this for debugging purposes
-    printf("No matching user found for: %s %s\n", name, surname);
+    //printf("No matching user found for: %s %s\n", name, surname);
     return 0; // User not found
 }
 
